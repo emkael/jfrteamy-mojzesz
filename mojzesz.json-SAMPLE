@@ -1,0 +1,27 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "port": 3306,
+        "database": "",
+        "user": "",
+        "password": ""
+    },
+    "source": {
+        "url": "",
+        "auth": {
+            "user": "",
+            "pass": ""
+        },
+        "headers": {
+        }
+    },
+    "settings": {
+        "pbn_round": 1,
+        "teamy_round": 1,
+        "teamy_segment": 1,
+        "fetch_lineups": 0,
+        "overwrite_scores": 0,
+        "info_messages": 0,
+        "job_interval": 60
+    }
+}
