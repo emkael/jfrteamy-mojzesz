@@ -17,6 +17,7 @@ class TeamyDB(object):
             database=settings['database'])
         self.db_cursor = self.database.cursor(buffered=True)
         self.db_name = settings['database']
+        logging.info('Connected to database %s', self.db_name)
 
     def get_cursor(self):
         return self.db_cursor
