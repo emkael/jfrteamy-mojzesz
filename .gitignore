@@ -2,3 +2,5 @@ www/
 config.json
 *.pyc
 *.json
+build/
+dist/
