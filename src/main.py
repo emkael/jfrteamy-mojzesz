@@ -274,21 +274,21 @@ def fetch_scores(pbn, db, settings):
 
 
 def main_loop():
+    settings = {}
     try:
         config = get_config()
         setup_logging(config)
+        settings = config.get('settings', {})
 
         db = TeamyDB(config.get('mysql'))
         pbn = get_pbn_source(config.get('source'))
 
-        settings = config.get('settings', {})
         if settings.get('fetch_lineups', 0) > 0:
             fetch_lineups(pbn, db, settings)
 
         fetch_scores(pbn, db, settings)
     except Exception as ex:
         logging.error(ex)
-        raise
 
     return settings.get('job_interval', 60)
 
