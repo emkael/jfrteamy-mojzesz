@@ -1,4 +1,4 @@
-import sys
+import logging, sys
 
 
 class TeamyDB(object):
@@ -22,7 +22,7 @@ class TeamyDB(object):
         return self.db_cursor
 
     def __execute_query(self, sql, params):
-        #print('DEBUG: query (%s): %s | %s' % (self.db_name, sql.replace('\n', ' '), params))
+        logging.debug('query (%s): %s | %s' % (self.db_name, sql.replace('\n', ' '), params))
         self.db_cursor.execute(sql, params)
 
     def fetch(self, sql, params=None):
@@ -32,7 +32,7 @@ class TeamyDB(object):
             row = self.db_cursor.fetchone()
             return row
         except mysql.connector.Error as e:
-            print('ERROR: ' + str(e))
+            logging.error(str(e))
             raise IOError(e.errno, str(e), sql)
 
     def fetch_all(self, sql, params=None):
@@ -42,6 +42,6 @@ class TeamyDB(object):
             results = self.db_cursor.fetchall()
             return results
         except mysql.connector.Error as e:
-            print('ERROR: ' + str(e))
+            logging.error(str(e))
             raise IOError(
                 e.errno, str(e), sql)

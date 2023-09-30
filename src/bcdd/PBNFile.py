@@ -5,13 +5,12 @@ from .PBNBoard import PBNBoard
 
 class PBNFile(object):
 
-    def __init__(self, filename):
+    def __init__(self, pbn_file, filename=None):
         self._filename = filename
         self.output_file = None
         self.boards = []
         lines = []
-        with open(self._filename) as pbn_file:
-            contents = pbn_file.readlines()
+        contents = pbn_file.readlines()
         first_line = 1
         for line_no in range(0, len(contents)):
             line = contents[line_no].strip()
@@ -40,4 +39,5 @@ class PBNFile(object):
             raise IOError('No boards written to PBN file, unable to save it.')
         tmp_path = self.output_file.name
         self.output_file.close()
-        shutil.move(tmp_path, self._filename)
+        if self._filename is not None:
+            shutil.move(tmp_path, self._filename)

@@ -1,4 +1,5 @@
-import json, os, sys
+import io, json, logging, os, sys
+import requests
 
 from bcdd.PBNFile import PBNFile
 from jfrteamy.db import TeamyDB
@@ -12,10 +13,25 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-with open(sys.argv[1]) as config_file:
+with open('mojzesz.json') as config_file:
     config = json.load(config_file)
 
-f = PBNFile('../Segment.pbn')
+logging_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
+logging.basicConfig(
+     level=logging_levels[config['settings'].get('info_messages', 0)],
+     format= '%(levelname)s:\t%(message)s'
+ )
+
+request_auth = None
+if 'auth' in config['source']:
+    request_auth = (config['source']['auth']['user'], config['source']['auth']['pass'])
+request_headers = config['source'].get('headers', {})
+r = requests.get(config['source']['url'], auth=request_auth, headers=request_headers)
+r.raise_for_status()
+
+with io.StringIO(r.text) as io_stream:
+    f = PBNFile(io_stream)
+
 db = TeamyDB(config['mysql'])
 
 clear()
@@ -70,7 +86,7 @@ if config['settings']['fetch_lineups'] > 0:
                         if player == roster_pl:
                             player_id = roster_id
                             position = room + positions[1 - (room == which_room)][i]
-                            print('INFO: Player in lineup: Table %d, position %s, #%d %s' % (
+                            logging.info('Player in lineup: Table %d, position %s, #%d %s' % (
                                 table, position,
                                 roster_id, roster_pl))
                             db.fetch(
@@ -81,7 +97,7 @@ if config['settings']['fetch_lineups'] > 0:
                                 )
                             )
                     if player_id is None:
-                        print('WARNING: Player %s not found in team %d', (player, team))
+                        logging.warning('Player %s not found in team %d', (player, team))
 
 board_mapping = {}
 for b in db.fetch_all('SELECT brd, bno FROM boards WHERE rnd = %s AND segment = %s', (
@@ -93,7 +109,7 @@ for b in f.boards:
         if b.get_field('Round') == str(config['settings']['pbn_round']):
             board = int(b.get_field('Board'))
             if board not in board_mapping:
-                print('ERROR: board %d not meant to be played in segment %d-%d' % (
+                logging.error('board %d not meant to be played in segment %d-%d' % (
                     board, config['settings']['teamy_round'], config['settings']['teamy_segment']))
                 continue
             board_no = board_mapping[board]
@@ -106,7 +122,7 @@ for b in f.boards:
                                              table, room, board_no))
                 if current_score:
                     break
-                print('INFO: record in scores table does not exist - creating')
+                logging.info('record in scores table does not exist - creating')
                 db.fetch('INSERT INTO scores(rnd, segment, tabl, room, board, mecz, butler, processed, tims) VALUES(%s, %s, %s, %s, %s, 0, 0, 1, NOW())', (
                     config['settings']['teamy_round'], config['settings']['teamy_segment'],
                     table, room, board_no))
@@ -115,23 +131,27 @@ for b in f.boards:
             contract = b.get_field('Contract').replace('*', ' x').replace('x x', 'xx')
             if contract[0].isdigit():
                 contract = contract[0] + ' ' + contract[1:]
-            result = int(b.get_field('Result')) - get_digits(contract) - 6
+                result = int(b.get_field('Result')) - get_digits(contract) - 6
+                score = int(b.get_field('Score').replace('NS ', '')) # co z pasami?
+            else: # passed-out hand
+                contract = contract.upper()
+                result = 0
+                score = 0
             lead = '' # wtf?
-            score = int(b.get_field('Score').replace('NS ', '')) # co z pasami?
 
             update_score = True
             if current_score[4] is not None:
                 if not config['settings']['overwrite_scores']:
                     update_score = False
                     if score != current_score[4]:
-                        print('WARNING: result in board %d, table %d-%d changed and is not going to be overwritten!' % (
+                        logging.warning('result in board %d, table %d-%d changed and is not going to be overwritten!' % (
                             board, table, room))
                     else:
-                        print('INFO: not overwriting result in board %d, table %d-%d' % (
+                        logging.info('not overwriting result in board %d, table %d-%d' % (
                             board, table, room))
             if update_score:
                 params = (contract, declarer, result, lead, score)
-                print('INFO: updating result in board %d, table %d-%d: %s' % (
+                logging.info('updating result in board %d, table %d-%d: %s' % (
                             board, table, room, params))
                 db.fetch('UPDATE scores SET contract = %s, declarer = %s, result = %s, lead = %s, score = %s, '+
                          'tims = NOW(), processed = 0, mecz = 1, butler = 1 '+
@@ -139,13 +159,13 @@ for b in f.boards:
                     params + (config['settings']['teamy_round'], config['settings']['teamy_segment'], board_no, table, room)))
 
             if not b.has_field('Auction'):
-                print('INFO: no bidding for board %d, table %d-%d' % (
+                logging.info('no bidding for board %d, table %d-%d' % (
                     board, table, room))
                 continue
             bidding = b.get_auction()
             dealer = bidding[0]
             if dealer != b.get_field('Dealer'):
-                print('WARNING: bidding does not start from the dealer in board %d, table %d-%d' % (
+                logging.warning('bidding does not start from the dealer in board %d, table %d-%d' % (
                     board, table, room))
             bidding = ' '.join(bidding[1:]).split(' ')
             html_bidding = []
@@ -174,7 +194,7 @@ for b in f.boards:
                 if i % 4 == 3:
                     html += "</tr>"
             html += '</table>'
-            print('INFO: updating bidding in board %d, table %d-%d' % (
+            logging.info('updating bidding in board %d, table %d-%d' % (
                 board, table, room))
             db.fetch('UPDATE scores SET auction = %s, bbo = %s, '+
                      'tims = NOW(), processed = 0 '+
