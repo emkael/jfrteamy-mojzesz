@@ -1,6 +1,5 @@
 ﻿import re
 
-from .BCalcWrapper import BCalcWrapper
 from .Exceptions import FieldNotFoundException, DDTableInvalidException
 
 
@@ -18,6 +17,9 @@ class PBNBoard(object):
     ability_pattern = re.compile(r'\b([NESW]):([0-9A-D]{5})\b')
     optimum_result_table_pattern = re.compile(
         r'^([NESW])\s+([CDHSN])T?\s+(\d+)$')
+
+    DENOMINATIONS = [ 'C', 'D', 'H', 'S', 'N' ]
+    PLAYERS = [ 'N', 'E', 'S', 'W' ]
 
     def __init__(self, lines, line_no=None):
         self.line_number = line_no
@@ -98,7 +100,7 @@ class PBNBoard(object):
     def write_ability(self, dd_table):
         sb = ''
         for i in range(0, 4):
-            sb += BCalcWrapper.PLAYERS[i]
+            sb += PBNBoard.PLAYERS[i]
             sb += ':'
             sb += ''.join(['%X' % (j) for j in dd_table[i]])[::-1]
             sb += ' '
@@ -206,9 +208,9 @@ class PBNBoard(object):
             for j in range(0, 5):
                 self.fields.append(PBNField(
                     raw_data='%s %s%s %d' % (
-                        BCalcWrapper.PLAYERS[i],
-                        BCalcWrapper.DENOMINATIONS[j],
-                        'T' if BCalcWrapper.DENOMINATIONS[j] == 'N' else '',
+                        PBNBoard.PLAYERS[i],
+                        PBNBoard.DENOMINATIONS[j],
+                        'T' if PBNBoard.DENOMINATIONS[j] == 'N' else '',
                         dd_table[i][j])))
 
     def save_par_contract(self, contract, jfr_only=False):

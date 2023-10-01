@@ -1,6 +1,6 @@
 import functools
 
-from .BCalcWrapper import BCalcWrapper as bcw
+from .PBNBoard import PBNBoard as pbb
 from .Exceptions import ParScoreInvalidException
 
 
@@ -100,21 +100,21 @@ class ParContract(object):
         return score
 
     def __gt__(self, other):
-        denomination = bcw.DENOMINATIONS.index(self.denomination) \
-                       if self.denomination in bcw.DENOMINATIONS \
+        denomination = pbb.DENOMINATIONS.index(self.denomination) \
+                       if self.denomination in pbb.DENOMINATIONS \
                           else -1
-        other_denomination = bcw.DENOMINATIONS.index(
+        other_denomination = pbb.DENOMINATIONS.index(
             other.denomination) \
-            if other.denomination in bcw.DENOMINATIONS else -1
+            if other.denomination in pbb.DENOMINATIONS else -1
         return (self.level > other.level) \
             or ((self.level == other.level) \
                 and (denomination > other_denomination))
 
     def get_defense(self, dd_table, vulnerable):
-        declarer_index = bcw.PLAYERS.index(self.declarer) \
-                         if self.declarer in bcw.PLAYERS else -1
-        denomination_index = bcw.DENOMINATIONS.index(self.denomination) \
-                             if self.denomination in bcw.DENOMINATIONS else -1
+        declarer_index = pbb.PLAYERS.index(self.declarer) \
+                         if self.declarer in pbb.PLAYERS else -1
+        denomination_index = pbb.DENOMINATIONS.index(self.denomination) \
+                             if self.denomination in pbb.DENOMINATIONS else -1
         if (self.level != 0) \
            and (self.level + 6
                 <= dd_table[declarer_index][denomination_index]):
@@ -132,8 +132,8 @@ class ParContract(object):
                         if level + 6 > dd_table[defender][i]:
                             defense = ParContract(
                                 level,
-                                bcw.DENOMINATIONS[i],
-                                bcw.PLAYERS[defender],
+                                pbb.DENOMINATIONS[i],
+                                pbb.PLAYERS[defender],
                                 True,
                                 0)
                             defense.score = defense.calculate_score(

@@ -1,6 +1,6 @@
 import re
 
-from .BCalcWrapper import BCalcWrapper as bcw
+from .PBNBoard import PBNBoard as pbb
 from .ParContract import ParContract
 from .Exceptions import FieldNotFoundException
 
@@ -68,16 +68,16 @@ class ParScore(object):
                or ((i % 2 == 1) and for_ew):
                 for j in range(0, 5):
                     level = dd_table[i][j] - 6
-                    denomination = bcw.DENOMINATIONS.index(
+                    denomination = pbb.DENOMINATIONS.index(
                         contract.denomination) \
-                        if contract.denomination in bcw.DENOMINATIONS \
+                        if contract.denomination in pbb.DENOMINATIONS \
                            else -1
                     if (level > contract.level) \
                        or ((level == contract.level) \
                            and (j > denomination)):
                         contract.level = level
-                        contract.denomination = bcw.DENOMINATIONS[j]
-                        contract.declarer = bcw.PLAYERS[i]
+                        contract.denomination = pbb.DENOMINATIONS[j]
+                        contract.declarer = pbb.PLAYERS[i]
                         tricks = dd_table[i][j]
         vulnerability = self._board.get_vulnerable().upper()
         vulnerable = self._determine_vulnerability(
@@ -104,11 +104,11 @@ class ParScore(object):
         if highest_defense is not None:
             # Highest contract has profitable defense
             return highest_defense.validate()
-        denomination_index = bcw.DENOMINATIONS.index(highest.denomination) \
-                             if highest.denomination in bcw.DENOMINATIONS \
+        denomination_index = pbb.DENOMINATIONS.index(highest.denomination) \
+                             if highest.denomination in pbb.DENOMINATIONS \
                                 else -1
-        declarer_index = bcw.PLAYERS.index(highest.declarer) \
-                         if highest.declarer in bcw.PLAYERS else -1
+        declarer_index = pbb.PLAYERS.index(highest.declarer) \
+                         if highest.declarer in pbb.PLAYERS else -1
         player_indexes = [declarer_index, (declarer_index + 2) % 4]
         vulnerable = self._determine_vulnerability(
             vulnerability, highest.declarer)
@@ -122,8 +122,8 @@ class ParScore(object):
                 while level > 0:
                     contract = ParContract(
                         level,
-                        bcw.DENOMINATIONS[i],
-                        bcw.PLAYERS[player],
+                        pbb.DENOMINATIONS[i],
+                        pbb.PLAYERS[player],
                         False, 0)
                     contract.score = contract.calculate_score(
                         dd_table[player][i], vulnerable)
