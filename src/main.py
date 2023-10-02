@@ -20,6 +20,8 @@ def get_config():
 
 
 def setup_logging(config):
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
     logging_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
     logging.basicConfig(
         level=logging_levels[config['settings'].get('info_messages', 0)],
