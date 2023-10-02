@@ -50,8 +50,7 @@ Quirks, assumptions and known issues
 ====================================
 
  * one only section within the PBN is supported: table number (`[Table "XX"]`) is stripped of any section letters and converted to numerical value that must match the table number in Teamy database
- * LoveBridge exports seem to indicated double in the `[Contract ""]` field by `*`, not `x` - both notations are supported
- * there's no support for initial lead card, hopefully: yet; when it comes, it's most likely going to be in a non-standard PBN field
+ * LoveBridge exports seem to indicate double in the `[Contract ""]` field by `*`, not `x` - both notations are supported
  * bidding data is always overwriting values in the database
  * lineups, if requested, are always overwriting values in the database
  * if the records for specific boards are missing from the `scores` table in event database (as in, JFR Webmaster haven't created them yet), they are created

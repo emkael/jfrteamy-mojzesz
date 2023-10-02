@@ -166,6 +166,11 @@ class PBNBoard(object):
     def get_auction(self):
         return self.get_extended_raw_field('Auction', with_header=True)
 
+    def get_play_data(self):
+        if self.has_field('Play'):
+            return self.get_extended_raw_field('Play', with_header=False)
+        return None
+
     def get_extended_raw_field(self, field_name, with_header=False):
         field_found = False
         result = []

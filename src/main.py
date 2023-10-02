@@ -148,11 +148,16 @@ def get_pbn_score(b):
         contract = contract[0] + ' ' + contract[1:]
         result = int(b.get_field('Result')) - get_digits(contract) - 6
         score = int(b.get_field('Score').replace('NS ', '')) # co z pasami?
+        play_data = b.get_play_data()
+        if play_data:
+            play_data = ' '.join(play_data).split(' ')
+            if play_data:
+                lead = play_data[0].strip()
+                lead = lead[0] + ' ' + lead[1]
     else: # passed-out hand
         contract = contract.upper()
         result = 0
         score = 0
-    lead = '' # wtf?
     return declarer, contract, result, score, lead
 
 
