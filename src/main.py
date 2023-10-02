@@ -144,12 +144,15 @@ def get_current_db_score(db, round_no, segment_no, table, room, board_no):
 
 
 def get_pbn_score(b):
-    declarer = b.get_field('Declarer')
-    contract = b.get_field('Contract').replace('*', ' x').replace('x x', 'xx')
+    contract = b.get_field('Contract').replace('*', ' x').replace('x x', 'xx') if b.has_field('Contract') else ''
+    if not contract:
+        return None, None, None, None, None
+    declarer = b.get_field('Declarer') if b.has_field('Declarer') else ''
+    lead = ''
     if contract[0].isdigit():
         contract = contract[0] + ' ' + contract[1:]
-        result = int(b.get_field('Result')) - get_digits(contract) - 6
-        score = int(b.get_field('Score').replace('NS ', '')) # co z pasami?
+        result = int(b.get_field('Result')) - get_digits(contract) - 6 if b.has_field('Result') else ''
+        score = int(b.get_field('Score').replace('NS ', '')) if b.has_field('Score') else '' # a co z pasami?
         play_data = b.get_play_data()
         if play_data:
             play_data = ' '.join(play_data).split(' ')
@@ -170,11 +173,16 @@ def update_score(db, pbn_board, round_no, segment_no, table, room, board_no, rea
     current_score = get_current_db_score(db, round_no, segment_no, table, room, board_no)
     declarer, contract, result, score, lead = get_pbn_score(pbn_board)
 
+    if contract is None:
+        logging.info('no contract yet in board %d, table %d-%d',
+                     real_board_no, table, room)
+        return
+
     update_score = True
-    if current_score[4] is not None:
-        if not overwrite:
+    if current_score[4] or current_score == 0: # there's a score, so the result was already fully imported
+        if not overwrite: # we need to check if we should overwrite the score, if not
             update_score = False
-            if score != current_score[4]:
+            if score != current_score[4]: # then emit a warning if it's changed
                 logging.warning('result in board %d, table %d-%d changed and is NOT going to be overwritten!',
                                 real_board_no, table, room)
             else:
