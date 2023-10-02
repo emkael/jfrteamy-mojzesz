@@ -158,7 +158,7 @@ def get_pbn_score(b):
             play_data = ' '.join(play_data).split(' ')
             if play_data:
                 lead = play_data[0].strip()
-                lead = lead[0] + ' ' + lead[1]
+                lead = lead[0:2]
     else: # passed-out hand
         contract = contract.upper()
         result = 0
