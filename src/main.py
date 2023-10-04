@@ -84,7 +84,7 @@ def get_pbn_lineups(pbn, round_no):
 
 def fetch_lineups(pbn, db, settings):
     rosters = get_team_rosters(db)
-    tables = get_pbn_lineups(pbn, settings['teamy_round'])
+    tables = get_pbn_lineups(pbn, settings['pbn_round'])
     round_lineup = get_round_lineup(db, settings['teamy_round'], settings['teamy_segment'])
 
     for t, rooms in tables.items():
