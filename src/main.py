@@ -271,9 +271,11 @@ def update_auction(db, pbn_board, round_no, segment_no, table, room, board_no, r
 def fetch_scores(pbn, db, settings):
     round_lineup = get_round_lineup(db, settings['teamy_round'], settings['teamy_segment'])
     board_mapping = get_board_mapping(db, settings['teamy_round'], settings['teamy_segment'])
+    boards_found = False
     for b in pbn.boards:
         if b.has_field('Round'):
             if b.get_field('Round') == str(settings['pbn_round']):
+                boards_found = True
                 board = int(b.get_field('Board'))
 
                 if board not in board_mapping:
@@ -296,6 +298,8 @@ def fetch_scores(pbn, db, settings):
 
                 update_auction(db, b, settings['teamy_round'], settings['teamy_segment'], table, room, board_no,
                                real_board_no=board)
+    if not boards_found:
+        logging.warning('No [Round "%s"] boards found in PBN file', str(settings['pbn_round']))
 
 
 def main_loop():
