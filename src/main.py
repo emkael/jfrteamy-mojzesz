@@ -147,7 +147,7 @@ def get_current_db_score(db, round_no, segment_no, table, room, board_no):
 
 
 def get_pbn_score(b):
-    contract = b.get_field('Contract').replace('*', ' x').replace('x x', 'xx') if b.has_field('Contract') else ''
+    contract = b.get_field('Contract').replace('N', 'NT').replace('X', ' x').replace('*', ' x').replace('x x', 'xx') if b.has_field('Contract') else ''
     if not contract:
         return None, None, None, None, None
     declarer = b.get_field('Declarer') if b.has_field('Declarer') else ''
