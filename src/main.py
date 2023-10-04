@@ -89,6 +89,9 @@ def fetch_lineups(pbn, db, settings):
 
     for t, rooms in tables.items():
         table = get_digits(t)
+        if table not in round_lineup:
+            logging.error('[Table "%s"] not in tournament for round %s-%s', table, settings['teamy_round'], settings['teamy_segment'])
+            continue
         home_team = round_lineup[table][0]
         away_team = round_lineup[table][1]
         home_roster = rosters[home_team]
@@ -266,6 +269,7 @@ def update_auction(db, pbn_board, round_no, segment_no, table, room, board_no, r
 
 
 def fetch_scores(pbn, db, settings):
+    round_lineup = get_round_lineup(db, settings['teamy_round'], settings['teamy_segment'])
     board_mapping = get_board_mapping(db, settings['teamy_round'], settings['teamy_segment'])
     for b in pbn.boards:
         if b.has_field('Round'):
@@ -277,9 +281,15 @@ def fetch_scores(pbn, db, settings):
                                   board, settings['teamy_round'], settings['teamy_segment'])
                     continue
 
+
                 board_no = board_mapping[board]
+
                 table = get_digits(b.get_field('Table'))
                 room = 1 if b.get_field('Room') == 'Open' else 2
+
+                if table not in round_lineup:
+                    logging.error('[Table "%s"] not in tournament for round %s-%s', table, settings['teamy_round'], settings['teamy_segment'])
+                    continue
 
                 update_score(db, b, settings['teamy_round'], settings['teamy_segment'], table, room, board_no,
                              real_board_no=board, overwrite=settings['overwrite_scores'])
