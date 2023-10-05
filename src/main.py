@@ -67,24 +67,32 @@ def get_round_lineup(db, round_no, segment_no):
     return round_lineup
 
 
-def get_pbn_lineups(pbn, round_no):
+def get_pbn_lineups(pbn, round_no, board_no=None):
     tables = {}
     for b in pbn.boards:
         if b.has_field('Round'):
             if b.get_field('Round') == str(round_no):
-                table = b.get_field('Table')
-                if table not in tables:
-                    tables[table] = {}
-                tables[table][b.get_field('Room')] = [
-                    [b.get_field('North'), b.get_field('South')],
-                    [b.get_field('East'), b.get_field('West')]
+                if not board_no or (str(board_no) == b.get_field('Board')):
+                    table = b.get_field('Table')
+                    if table not in tables:
+                        tables[table] = {}
+                    if board_no:
+                        logging.info('Fetching lineups from board no %d, table %s %s', board_no, table, b.get_field('Room'))
+                    tables[table][b.get_field('Room')] = [
+                        [b.get_field('North', ''), b.get_field('South', '')],
+                        [b.get_field('East', ''), b.get_field('West', '')]
                 ]
     return tables
 
 
 def fetch_lineups(pbn, db, settings):
     rosters = get_team_rosters(db)
-    tables = get_pbn_lineups(pbn, settings['pbn_round'])
+    lineup_board_no = settings.get('lineup_board_no', None)
+    if lineup_board_no is None:
+        board_mapping = get_board_mapping(db, settings['teamy_round'], settings['teamy_segment'])
+        lineup_board_no = list(board_mapping.keys())[list(board_mapping.values()).index(1)]
+        logging.info('No lineup board number specified in config, reverting to first board of segment: %d', lineup_board_no)
+    tables = get_pbn_lineups(pbn, settings['pbn_round'], lineup_board_no)
     round_lineup = get_round_lineup(db, settings['teamy_round'], settings['teamy_segment'])
 
     for t, rooms in tables.items():

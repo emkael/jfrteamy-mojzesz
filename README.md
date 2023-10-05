@@ -40,6 +40,7 @@ As for `settings` section:
  * `pbn_round` is the round in PBN file for which the boards should be read (filtered by `[Round "X"]` fields)
  * `teamy_round` and `teamy_segment` point to the round and segment in JFR Teamy event database into which data is imported
  * `fetch_lineups` enables reading lineups from PBN files, strict comparison of full name + surname is conducted, and players have to be in correct Teamy rosters
+ * `lineup_board_no` specifies from which board lineups should be read, if not set, first board of the segment is taken; set to `0` to read from any board
  * `overwrite_scores` enables overwriting existing scores: otherwise, if a score in board points has changed in PBN from the one present in Teamy database, a warning is emitted
  * `info_messages` controls logging verbosity: 0 = warnings and errors, 1 = info messages, warnings and errors, 2 = debug output
  * `job_interval` is number of seconds between subsequent runs

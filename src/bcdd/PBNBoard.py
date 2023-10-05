@@ -40,10 +40,12 @@ class PBNBoard(object):
                 return True
         return False
 
-    def get_field(self, key):
+    def get_field(self, key, default=None):
         for field in self.fields:
             if key == field.key:
                 return field.value
+        if default is not None:
+            return default
         raise FieldNotFoundException(key + ' field not found')
 
     def delete_field(self, key):
