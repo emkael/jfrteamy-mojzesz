@@ -102,8 +102,8 @@ def fetch_lineups(pbn, db, settings):
             continue
         home_team = round_lineup[table][0]
         away_team = round_lineup[table][1]
-        home_roster = rosters[home_team]
-        away_roster = rosters[away_team]
+        home_roster = rosters.get(home_team, {})
+        away_roster = rosters.get(away_team, {})
         lineups = {}
         positions = [['N', 'S'], ['E', 'W']]
         for room, lineup in rooms.items():
