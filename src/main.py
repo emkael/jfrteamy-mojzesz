@@ -39,6 +39,7 @@ def get_pbn_source(config):
     r = requests.get(config['url'], auth=request_auth, headers=request_headers)
     r.raise_for_status()
 
+    r.encoding = config.get('encoding', 'utf8')
     remote_content = r.text
     logging.info('Fetched %d bytes', len(remote_content))
 

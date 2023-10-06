@@ -33,7 +33,7 @@ Two main data sources are required to run the script:
  * a PBN file accessible via HTTP(S)
  * a `mojzesz.json` config file in the current (working) directory
 
-Sample config file is provided in the repo. `mysql` and `source` sections should be self-explanatory (`auth` section is not required if PBN is not behind HTTP Auth, and `headers` section is just explicitly forwarded to the HTTP(S) request headers).
+Sample config file is provided in the repo. `mysql` and `source` sections should be self-explanatory (`auth` section is not required if PBN is not behind HTTP Auth, and `headers` section is just explicitly forwarded to the HTTP(S) request headers, and `encoding` is optional, to force PBN encoding, defaulting to utf8).
 
 As for `settings` section:
 
