@@ -326,8 +326,7 @@ def main_loop():
 
         fetch_scores(pbn, db, settings)
     except Exception as ex:
-        logging.error(ex)
-        raise
+        logging.error(repr(ex))
 
     return settings.get('job_interval', 60)
 
