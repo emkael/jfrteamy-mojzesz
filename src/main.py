@@ -223,7 +223,7 @@ def get_lin_bidding(bidding):
             lin_bidding.append('p')
             continue
         lin_bidding.append(bid.replace('NT', 'N'))
-    lin_bidding = 'mb|'.join([bid + '|' for bid in lin_bidding]) + 'pg||'
+    lin_bidding = 'mb|' + 'mb|'.join([bid + '|' for bid in lin_bidding]) + 'pg||'
     return lin_bidding
 
 
